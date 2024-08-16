@@ -5,6 +5,14 @@ from config.config import ApiConnekta
 from process_modules.database_inserts import insert_params_config as database
 from log_book import logger_config
 
+
+
+def config_mapping(parameters, filter_value, key_name='Nombre'):
+    for config in parameters:
+        if config[key_name] == filter_value:
+            return config['Valor']
+
+
 def get_parametros_connekta(filtro_parametro=""):
 
     # Consumo notificacion Connekta

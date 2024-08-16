@@ -9,8 +9,9 @@ from  multiprocessing import Manager,Process
 from datetime import datetime
 from config.config import properties
 from database.queries import execute_update_query
-
-
+from database import queries
+from config.config import properties
+import multiprocessing
 
 
 def create_zip(result_facturas, path_local_fe,path_ftp_fe, resultados_dane, batch_id,id_corte,fecha_limite_pago,nombre_lote,id_lote,conn_str,shared_properties):
@@ -152,3 +153,17 @@ def generartion_fe(id_corte, batch_id, conn_str,fecha_limite_pago):
             conn.close()
 
 
+def generate_fe_validate_corte(conexion_db_pyodbc):
+
+    list_cortes_to_process_fe=queries.execute_stored_procedure("get_corte_to_process_bscs", conexion_db_pyodbc,[1])
+    multiprocessing.freeze_support()
+
+    for corte in list_cortes_to_process_fe:
+        id_corte = corte[0]
+        ciclo = corte[4]
+        batch_id = corte[2]
+
+        properties.fecha_limite_pago = queries.execute_stored_procedure('equivalencia_get_corte_fecha_bscs', conexion_db_pyodbc, [ciclo])[0][1]
+
+        generartion_fe(id_corte,batch_id,conexion_db_pyodbc,properties.fecha_limite_pago)
+        queries.execute_update_query("sp_update_corte_estado_bscs",conexion_db_pyodbc,[id_corte,2])

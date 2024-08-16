@@ -2,7 +2,6 @@ from api import connekta_system_parameters as params
 from database import queries
 from config.config import properties
 from process_modules.files_generation.fe_file_generation_flow import generartion_fe
-import multiprocessing
 
 def generate_fe_validate_corte(conexion_db_pyodbc):
     list_cortes_to_process_fe=queries.execute_stored_procedure("get_corte_to_process_bscs", conexion_db_pyodbc,[1])
